@@ -18,3 +18,4 @@ alias v='nvim'
 
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
 
+eval "$(starship init zsh)"
