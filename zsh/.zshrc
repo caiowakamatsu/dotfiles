@@ -18,4 +18,7 @@ alias v='nvim'
 
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
 
+export CC=/usr/bin/clang
+export CXX=/usr/bin/clang++
+
 eval "$(starship init zsh)"
