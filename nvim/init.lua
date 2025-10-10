@@ -254,3 +254,5 @@ end, { desc = "Pick a colorscheme" })
 
 vim.keymap.set("n", "<leader>r", "<cmd>Telescope live_grep<cr>", { noremap = true, silent = true })
 
+vim.cmd('colorscheme koehler')
+
