@@ -17,6 +17,7 @@ alias gs='git status'
 alias v='nvim'
 
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
+[ -f /etc/profile.d/vulkan-sdk.sh ] && source /etc/profile.d/vulkan-sdk.sh
 
 export CC=/usr/bin/clang
 export CXX=/usr/bin/clang++
