@@ -1,3 +1,23 @@
+local function make_transparent()
+  local groups = {
+    "Normal","NormalNC","NormalFloat","FloatBorder",
+    "SignColumn","EndOfBuffer","LineNr","CursorLineNr",
+    "StatusLine","MsgArea","WinSeparator",
+    -- common plugin groups:
+    "TelescopeNormal","TelescopeBorder",
+    "NvimTreeNormal","NvimTreeNormalNC",
+    "NeoTreeNormal","NeoTreeNormalNC",
+  }
+  for _, g in ipairs(groups) do
+    pcall(vim.api.nvim_set_hl, 0, g, { bg = "NONE" })
+  end
+end
+
+vim.api.nvim_create_autocmd({ "ColorScheme", "VimEnter" }, {
+  callback = make_transparent,
+  desc = "Force transparent background after any colorscheme loads",
+})
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = "https://github.com/folke/lazy.nvim.git"

@@ -1,9 +1,5 @@
 return {
 	{
-		"xiyaowong/transparent.nvim",
-		lazy = false,
-	},
-	{
 		"sphamba/smear-cursor.nvim",
 		opts = {},
 	},

@@ -1,4 +1,4 @@
 require("config.lazy")
 
-vim.cmd('colorscheme koehler')
+vim.cmd('colorscheme tokyodark')
 
