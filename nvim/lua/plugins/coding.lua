@@ -12,6 +12,10 @@ return {
 		config = function()
 			local builtin = require('telescope.builtin')
 			vim.keymap.set("n", "<leader>f", builtin.find_files, { desc = "Telescope find files" })
+			vim.keymap.set("n", "<leader>r", builtin.live_grep, { desc = "Telescope live grep" })
+			vim.keymap.set("n", "<leader>cs", function()
+				require("telescope.builtin").colorscheme({ enable_preview = true })
+			end, { desc = "Telescope color theme" })
 		end,
 	},
 	{
