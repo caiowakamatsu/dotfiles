@@ -102,141 +102,81 @@ vim.lsp.config("pyright", {
 
 local notify = require("notify")
 
-vim.keymap.set("n", "<leader>cd", function()
-  local buf = vim.api.nvim_create_buf(false, true)
+vim.defer_fn(function()
+  local cmake = require("config.cmake").find_cmake()
+  if cmake and cmake ~= "cmake" then
+		--vim.notify("CMake found at: " .. cmake, vim.log.levels.INFO, { title = "Build System" })
+  end
+end, 1000)
 
-  local width = math.floor(vim.o.columns * 0.8)
-  local height = math.floor(vim.o.lines * 0.5)
+-- 1) resolve cmake once
+local function find_cmake()
+  local p = vim.fn.exepath("cmake")
+  if p ~= "" then return p end
+  for _, f in ipairs({"/opt/homebrew/bin/cmake","/usr/local/bin/cmake","/usr/bin/cmake"}) do
+    if vim.fn.filereadable(f) == 1 then return f end
+  end
+  return "cmake" -- last-ditch; may still fail
+end
+local CMAKE = find_cmake()
+
+-- 2) tiny float-term helper
+local function float_term(cmd, opts)
+  opts = opts or {}
+  local buf = vim.api.nvim_create_buf(false, true)
+  local width  = math.floor(vim.o.columns * (opts.width_ratio  or 0.8))
+  local height = math.floor(vim.o.lines   * (opts.height_ratio or 0.5))
   local row = math.floor((vim.o.lines - height) / 2)
   local col = math.floor((vim.o.columns - width) / 2)
-
-  local opts = {
-    style = "minimal",
-    relative = "editor",
-    width = width,
-    height = height,
-    row = row,
-    col = col,
-    border = "rounded",
-  }
-
-  vim.api.nvim_open_win(buf, true, opts)
-
-  vim.fn.termopen("mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..", {
-    on_stdout = function(_, _, _)
-      local win = vim.api.nvim_get_current_win()
-      vim.api.nvim_win_set_cursor(win, {vim.api.nvim_buf_line_count(0), 0})
-    end,
-    on_stderr = function(_, _, _)
-      local win = vim.api.nvim_get_current_win()
-      vim.api.nvim_win_set_cursor(win, {vim.api.nvim_buf_line_count(0), 0})
-    end,
+  vim.api.nvim_open_win(buf, true, {
+    style = "minimal", relative = "editor",
+    width = width, height = height, row = row, col = col,
+    border = opts.border or "rounded",
   })
 
-  vim.api.nvim_buf_set_keymap(buf, "n", "q", "<cmd>bd!<CR>", { silent = true, noremap = true })
-end, { desc = "Configure CMake Debug Build in floating terminal" })
-
-vim.keymap.set("n", "<leader>cr", function()
-  local buf = vim.api.nvim_create_buf(false, true)
-
-  local width = math.floor(vim.o.columns * 0.8)
-  local height = math.floor(vim.o.lines * 0.5)
-  local row = math.floor((vim.o.lines - height) / 2)
-  local col = math.floor((vim.o.columns - width) / 2)
-
-  local opts = {
-    style = "minimal",
-    relative = "editor",
-    width = width,
-    height = height,
-    row = row,
-    col = col,
-    border = "rounded",
-  }
-
-  vim.api.nvim_open_win(buf, true, opts)
-
-  vim.fn.termopen("mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..", {
-    on_stdout = function(_, _, _)
-      local win = vim.api.nvim_get_current_win()
-      vim.api.nvim_win_set_cursor(win, {vim.api.nvim_buf_line_count(0), 0})
-    end,
-    on_stderr = function(_, _, _)
-      local win = vim.api.nvim_get_current_win()
-      vim.api.nvim_win_set_cursor(win, {vim.api.nvim_buf_line_count(0), 0})
-    end,
-  })
-
-  vim.api.nvim_buf_set_keymap(buf, "n", "q", "<cmd>bd!<CR>", { silent = true, noremap = true })
-end, { desc = "Configure CMake Release Build in floating terminal" })
-
-vim.keymap.set("n", "<leader>cp", function()
-  local buf = vim.api.nvim_create_buf(false, true)
-
-  local width = math.floor(vim.o.columns * 0.8)
-  local height = math.floor(vim.o.lines * 0.5)
-  local row = math.floor((vim.o.lines - height) / 2)
-  local col = math.floor((vim.o.columns - width) / 2)
-
-  local opts = {
-    style = "minimal",
-    relative = "editor",
-    width = width,
-    height = height,
-    row = row,
-    col = col,
-    border = "rounded",
-  }
-
-  vim.api.nvim_open_win(buf, true, opts)
-
-  vim.fn.termopen("mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..", {
-    on_stdout = function(_, _, _)
-      local win = vim.api.nvim_get_current_win()
-      vim.api.nvim_win_set_cursor(win, {vim.api.nvim_buf_line_count(0), 0})
-    end,
-    on_stderr = function(_, _, _)
-      local win = vim.api.nvim_get_current_win()
-      vim.api.nvim_win_set_cursor(win, {vim.api.nvim_buf_line_count(0), 0})
-    end,
-  })
-
-  vim.api.nvim_buf_set_keymap(buf, "n", "q", "<cmd>bd!<CR>", { silent = true, noremap = true })
-end, { desc = "Configure CMake RelWithDebugInfo Build in floating terminal" })
-
-vim.api.nvim_create_user_command("Build", function(opts)
-  local target = opts.args
-  if target == "" then
-    print("Usage: :Build <target>")
-    return
+  local function scroll_bottom()
+    local win = vim.api.nvim_get_current_win()
+    vim.api.nvim_win_set_cursor(win, {vim.api.nvim_buf_line_count(0), 0})
   end
 
-	local buf = vim.api.nvim_create_buf(false, true)
-	local win = vim.api.nvim_open_win(buf, true, {
-		relative = 'editor',
-		width = math.floor(vim.o.columns * 0.8),
-		height = math.floor(vim.o.lines * 0.8),
-		row = math.floor(vim.o.lines * 0.1),
-		col = math.floor(vim.o.columns * 0.1),
-		style = 'minimal',
-		border = 'single',
-	})
-
-  vim.fn.termopen("cmake --build build --parallel 20 --target " .. target, {
-    on_stdout = function(_, _, _)
-      local win = vim.api.nvim_get_current_win()
-      vim.api.nvim_win_set_cursor(win, {vim.api.nvim_buf_line_count(0), 0})
+  local job = vim.fn.termopen(cmd, {
+    cwd = opts.cwd,              -- <= important
+    on_stdout = function(...) scroll_bottom() end,
+    on_stderr = function(...) scroll_bottom() end,
+    on_exit = function(_, code, _)
+      vim.schedule(function()
+        vim.notify(("build exited %d"):format(code), code == 0 and vim.log.levels.INFO or vim.log.levels.ERROR)
+      end)
     end,
-    on_stderr = function(_, _, _)
-      local win = vim.api.nvim_get_current_win()
-      vim.api.nvim_win_set_cursor(win, {vim.api.nvim_buf_line_count(0), 0})
-    end,
+    env = opts.env,              -- e.g. env = { PATH = os.getenv("PATH") }
   })
 
-  vim.api.nvim_buf_set_keymap(buf, "n", "q", "<cmd>bd!<CR>", { silent = true, noremap = true })
-	end, {
-  nargs = 1,
-})
+  vim.keymap.set("n", "q", "<cmd>bd!<CR>", { buffer = buf, silent = true })
+  return job
+end
+
+-- 3) configure without shell; mkdir via Lua; use cwd + argv form
+local function configure_cmake(build_type)
+  vim.fn.mkdir("build", "p")
+  float_term(
+    { CMAKE, "-DCMAKE_BUILD_TYPE=" .. build_type, "-DCMAKE_EXPORT_COMPILE_COMMANDS=ON", ".." },
+    { cwd = "build" }
+  )
+end
+
+vim.keymap.set("n", "<leader>cd", function() configure_cmake("Debug") end,          { desc = "CMake Debug" })
+vim.keymap.set("n", "<leader>cr", function() configure_cmake("Release") end,        { desc = "CMake Release" })
+vim.keymap.set("n", "<leader>cp", function() configure_cmake("RelWithDebInfo") end, { desc = "CMake RelWithDebInfo" })
+
+-- 4) build target (no shell, proper argv, cwd)
+vim.api.nvim_create_user_command("Build", function(opts)
+  local t = opts.args
+  if t == "" then print("Usage: :Build <target>"); return end
+  float_term(
+    { CMAKE, "--build", "build", "--parallel", "20", "--target", t },
+    { height_ratio = 0.8, width_ratio = 0.8, border = "single" }
+  )
+end, { nargs = 1 })
 
 vim.api.nvim_create_autocmd("BufWritePre", {
   group = vim.api.nvim_create_augroup("AutoFormatOnSave", { clear = true }),
