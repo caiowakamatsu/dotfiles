@@ -8,6 +8,7 @@ return {
 	window_decorations = "RESIZE",
 	enable_tab_bar = false,
 	use_resize_increments = false,
+	enable_wayland = false,
   colors = {
     background = "#0C0F14",
     foreground = "#E0E1DD",
