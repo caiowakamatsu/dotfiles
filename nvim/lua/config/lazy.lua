@@ -47,6 +47,7 @@ require("lazy").setup({
 })
 
 require("config.cmake")
+require("config.lsp")
 
 require("notify").setup({
 	background_colour = "#000000",
