@@ -53,5 +53,12 @@ return {
     "mfussenegger/nvim-dap",
     "williamboman/mason.nvim",
   },
-}
+},
+	{
+		"rcarriga/nvim-dap-ui", 
+		dependencies = {
+			"mfussenegger/nvim-dap", 
+			"nvim-neotest/nvim-nio"
+		}
+},
 }
