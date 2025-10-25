@@ -56,7 +56,7 @@ vim.api.nvim_create_user_command("Build", function(opts)
   local t = opts.args
   if t == "" then print("Usage: :Build <target>"); return end
   float_term(
-    { CMAKE, "--build", "build", "--parallel", "20", "--target", t },
+    { M.find_cmake(), "--build", "build", "--parallel", "20", "--target", t },
     { height_ratio = 0.8, width_ratio = 0.8, border = "single" }
   )
 end, { nargs = 1 })
