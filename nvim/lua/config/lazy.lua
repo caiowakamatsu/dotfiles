@@ -41,6 +41,7 @@ require("lazy").setup({
     { import = "plugins.coding" },
     { import = "plugins.colors" },
     { import = "plugins.ui" },
+		{ import = "plugins.debugging" },
   },
   install = { colorscheme = { "habamax" } },
   checker = { enabled = true },
@@ -53,3 +54,22 @@ require("notify").setup({
 	background_colour = "#000000",
 })
 
+local dap = require('dap')
+dap.adapters.codelldb = {
+  type = "executable",
+  command = "/Users/caiowakamatsu/install/codelldb/extension/adapter/codelldb",
+}
+
+local dap = require('dap')
+dap.configurations.cpp = {
+	{
+		type = 'codelldb';
+		request = 'launch';
+		name = "Launch file";
+		program = "build/source/cfi_app";
+	},
+}
+
+vim.api.nvim_create_user_command("Debug", function(opts)
+
+end,)
