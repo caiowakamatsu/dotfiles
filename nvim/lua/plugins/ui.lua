@@ -1,8 +1,8 @@
 return {
-	{
-		"sphamba/smear-cursor.nvim",
-		opts = {},
-	},
+	--{
+		--"sphamba/smear-cursor.nvim",
+		--opts = {},
+	--},
 	{
 		"nvim-tree/nvim-tree.lua",
 		dependencies = { "nvim-tree/nvim-web-devicons" },
