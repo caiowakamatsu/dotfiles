@@ -3,13 +3,14 @@ local M = {}
 local float_term = require("util.float").float_terminal
 
 vim.api.nvim_create_user_command("Make", function(opts)
-  local t = opts.args
-  if t == "" then print("Usage: :Make <target>"); return end
+  if opts.args == "" then
+    print("Usage: :Make <targets>")
+    return
+  end
+  local args = vim.split(opts.args, "%s+")
   float_term(
-		{ "make", t},
+    vim.list_extend({ "make" }, args),
     { height_ratio = 0.8, width_ratio = 0.8, border = "single" }
   )
-end, { nargs = 1 })
-
-return M
+end, { nargs = "*" })
 
