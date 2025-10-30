@@ -48,6 +48,7 @@ require("lazy").setup({
 })
 
 require("config.cmake")
+require("config.make")
 require("config.lsp")
 require("config.dap")
 
